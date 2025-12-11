@@ -46,6 +46,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testCompressedReturnsTrueWhenCompressionConfigured(): void
     {
+        if (! defined('Redis::COMPRESSION_LZF')) {
+            $this->markTestSkipped('Redis::COMPRESSION_LZF is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_LZF,
         ]);
@@ -70,6 +74,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testLzfCompressedReturnsTrueWhenLzfConfigured(): void
     {
+        if (! defined('Redis::COMPRESSION_LZF')) {
+            $this->markTestSkipped('Redis::COMPRESSION_LZF is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_LZF,
         ]);
@@ -82,6 +90,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testLzfCompressedReturnsFalseWhenOtherCompression(): void
     {
+        if (! defined('Redis::COMPRESSION_ZSTD')) {
+            $this->markTestSkipped('Redis::COMPRESSION_ZSTD is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_ZSTD,
         ]);
@@ -94,6 +106,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testZstdCompressedReturnsTrueWhenZstdConfigured(): void
     {
+        if (! defined('Redis::COMPRESSION_ZSTD')) {
+            $this->markTestSkipped('Redis::COMPRESSION_ZSTD is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_ZSTD,
         ]);
@@ -106,6 +122,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testZstdCompressedReturnsFalseWhenOtherCompression(): void
     {
+        if (! defined('Redis::COMPRESSION_LZF')) {
+            $this->markTestSkipped('Redis::COMPRESSION_LZF is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_LZF,
         ]);
@@ -118,6 +138,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testLz4CompressedReturnsTrueWhenLz4Configured(): void
     {
+        if (! defined('Redis::COMPRESSION_LZ4')) {
+            $this->markTestSkipped('Redis::COMPRESSION_LZ4 is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_LZ4,
         ]);
@@ -130,6 +154,10 @@ class RedisConnectionTest extends TestCase
      */
     public function testLz4CompressedReturnsFalseWhenOtherCompression(): void
     {
+        if (! defined('Redis::COMPRESSION_LZF')) {
+            $this->markTestSkipped('Redis::COMPRESSION_LZF is not defined.');
+        }
+
         $connection = $this->createConnectionWithOptions([
             Redis::OPT_COMPRESSION => Redis::COMPRESSION_LZF,
         ]);

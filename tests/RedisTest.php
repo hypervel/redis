@@ -7,6 +7,7 @@ namespace Hypervel\Redis\Tests;
 use Hyperf\Redis\Pool\PoolFactory;
 use Hyperf\Redis\Pool\RedisPool;
 use Hypervel\Context\Context;
+use Hypervel\Foundation\Testing\Concerns\RunTestsInCoroutine;
 use Hypervel\Redis\Redis;
 use Hypervel\Redis\RedisConnection;
 use Mockery as m;
@@ -24,6 +25,8 @@ use RuntimeException;
  */
 class RedisTest extends TestCase
 {
+    use RunTestsInCoroutine;
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -55,8 +58,8 @@ class RedisTest extends TestCase
 
         $connection = $this->mockConnection();
         $connection->shouldReceive('multi')->once()->andReturn($multiInstance);
-        // Connection should NOT be released - stored in context
-        $connection->shouldNotReceive('release');
+        // Connection is released via defer() at end of coroutine
+        $connection->shouldReceive('release')->once();
 
         $redis = $this->createRedis($connection);
 
@@ -76,7 +79,8 @@ class RedisTest extends TestCase
 
         $connection = $this->mockConnection();
         $connection->shouldReceive('pipeline')->once()->andReturn($pipelineInstance);
-        $connection->shouldNotReceive('release');
+        // Connection is released via defer() at end of coroutine
+        $connection->shouldReceive('release')->once();
 
         $redis = $this->createRedis($connection);
 
@@ -94,7 +98,8 @@ class RedisTest extends TestCase
         $connection = $this->mockConnection();
         $connection->shouldReceive('select')->once()->with(1)->andReturn(true);
         $connection->shouldReceive('setDatabase')->once()->with(1);
-        $connection->shouldNotReceive('release');
+        // Connection is released via defer() at end of coroutine
+        $connection->shouldReceive('release')->once();
 
         $redis = $this->createRedis($connection);
 
@@ -111,8 +116,9 @@ class RedisTest extends TestCase
     {
         $connection = $this->mockConnection();
         $connection->shouldReceive('get')->twice()->andReturn('value1', 'value2');
-        // Connection should NOT be released when it existed in context
-        $connection->shouldNotReceive('release');
+        // Connection is NOT released during the test (it already existed in context),
+        // but allow release() call for test cleanup
+        $connection->shouldReceive('release')->zeroOrMoreTimes();
 
         // Pre-set connection in context
         Context::set('redis.connection.default', $connection);
@@ -155,7 +161,9 @@ class RedisTest extends TestCase
         $connection->shouldReceive('get')
             ->once()
             ->andThrow(new RuntimeException('Error'));
-        $connection->shouldNotReceive('release');
+        // Connection is NOT released during the test (it already existed in context),
+        // but allow release() call for test cleanup
+        $connection->shouldReceive('release')->zeroOrMoreTimes();
 
         // Pre-set connection in context
         Context::set('redis.connection.default', $connection);

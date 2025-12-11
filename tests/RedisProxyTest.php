@@ -7,6 +7,7 @@ namespace Hypervel\Redis\Tests;
 use Hyperf\Redis\Pool\PoolFactory;
 use Hyperf\Redis\Pool\RedisPool;
 use Hypervel\Context\Context;
+use Hypervel\Foundation\Testing\Concerns\RunTestsInCoroutine;
 use Hypervel\Redis\RedisConnection;
 use Hypervel\Redis\RedisProxy;
 use Mockery as m;
@@ -23,6 +24,8 @@ use Redis;
  */
 class RedisProxyTest extends TestCase
 {
+    use RunTestsInCoroutine;
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -60,7 +63,8 @@ class RedisProxyTest extends TestCase
     {
         $connection = $this->mockConnection();
         $connection->shouldReceive('pipeline')->once()->andReturn(m::mock(Redis::class));
-        $connection->shouldNotReceive('release');
+        // Connection is released via defer() at end of coroutine
+        $connection->shouldReceive('release')->once();
 
         $pool = m::mock(RedisPool::class);
         $pool->shouldReceive('get')->andReturn($connection);

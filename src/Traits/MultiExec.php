@@ -12,7 +12,7 @@ use RedisCluster;
 use function Hyperf\Tappable\tap;
 
 /**
- * Coroutine-safe multi-exec trait.
+ * Coroutine multi-exec trait.
  * @see Hyperf\Redis\Traits\MultiExec
  */
 trait MultiExec

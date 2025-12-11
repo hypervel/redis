@@ -8,6 +8,7 @@ use Hyperf\Redis\RedisConnection as HyperfRedisConnection;
 use Hypervel\Support\Arr;
 use Hypervel\Support\Collection;
 use Redis;
+use RedisCluster;
 use Throwable;
 
 /**
@@ -710,5 +711,81 @@ class RedisConnection extends HyperfRedisConnection
             $channels,
             $callback = fn ($redis, $pattern, $channel, $message) => $callback($message, $channel),
         ];
+    }
+
+    /**
+     * Get the underlying Redis client instance.
+     *
+     * Use this for operations requiring direct client access,
+     * such as evalSha with pre-computed SHA hashes.
+     */
+    public function client(): Redis|RedisCluster
+    {
+        return $this->connection;
+    }
+
+    /**
+     * Determine if a custom serializer is configured on the connection.
+     */
+    public function serialized(): bool
+    {
+        return defined('Redis::OPT_SERIALIZER')
+            && $this->connection->getOption(Redis::OPT_SERIALIZER) !== Redis::SERIALIZER_NONE;
+    }
+
+    /**
+     * Determine if compression is configured on the connection.
+     */
+    public function compressed(): bool
+    {
+        return defined('Redis::OPT_COMPRESSION')
+            && $this->connection->getOption(Redis::OPT_COMPRESSION) !== Redis::COMPRESSION_NONE;
+    }
+
+    /**
+     * Determine if LZF compression is in use.
+     */
+    public function lzfCompressed(): bool
+    {
+        return defined('Redis::COMPRESSION_LZF')
+            && $this->connection->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZF;
+    }
+
+    /**
+     * Determine if ZSTD compression is in use.
+     */
+    public function zstdCompressed(): bool
+    {
+        return defined('Redis::COMPRESSION_ZSTD')
+            && $this->connection->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_ZSTD;
+    }
+
+    /**
+     * Determine if LZ4 compression is in use.
+     */
+    public function lz4Compressed(): bool
+    {
+        return defined('Redis::COMPRESSION_LZ4')
+            && $this->connection->getOption(Redis::OPT_COMPRESSION) === Redis::COMPRESSION_LZ4;
+    }
+
+    /**
+     * Pack values for use in Lua script ARGV parameters.
+     *
+     * Unlike regular Redis commands where phpredis auto-serializes,
+     * Lua ARGV parameters must be pre-serialized strings.
+     *
+     * Requires phpredis 6.0+ which provides the _pack() method.
+     *
+     * @param array<int|string, mixed> $values
+     * @return array<int|string, string>
+     */
+    public function pack(array $values): array
+    {
+        if (empty($values)) {
+            return $values;
+        }
+
+        return array_map($this->connection->_pack(...), $values);
     }
 }

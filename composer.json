@@ -25,10 +25,23 @@
             "Hypervel\\Redis\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Hypervel\\Redis\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": "^8.2",
         "hyperf/redis": "~3.1.0",
+        "hypervel/core": "^0.3",
         "hypervel/support": "^0.3"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "hyperf/testing": "~3.1.0",
+        "mockery/mockery": "^1.6",
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^10.5"
     },
     "config": {
         "sort-packages": true

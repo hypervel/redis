@@ -259,6 +259,7 @@ class RedisConnectionTest extends TestCase
      */
     private function createConnectionWithClient(mixed $client): RedisConnection
     {
+        /** @var RedisConnection $connection */
         $connection = m::mock(RedisConnection::class)->makePartial();
 
         $reflection = new ReflectionClass(RedisConnection::class);

@@ -17,6 +17,9 @@ jobs:
             swoole: "5.1.6"
           - php: "8.3"
             swoole: "5.1.6"
+          # PHP 8.4 is temporarily disabled because laminas/laminas-mime (via hyperf/http-message) does not support it yet.
+          # - php: "8.4"
+          #   swoole: "6.0.2"
 
     name: PHP ${{ matrix.php }} (swoole-${{ matrix.swoole }})
 

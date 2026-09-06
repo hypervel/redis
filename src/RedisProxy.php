@@ -80,6 +80,7 @@ class RedisProxy implements ConnectionContract
         'safescan',
         'setoption',
         'shouldtransform',
+        'withoutscanprefix',
     ];
 
     /**

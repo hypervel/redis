@@ -1652,6 +1652,33 @@ abstract class RedisConnection extends BaseConnection implements NonCopyableCont
     }
 
     /**
+     * Execute the given callback without prefixing scan patterns.
+     *
+     * Key prefixing remains unchanged. Hold this connection until the callback
+     * finishes so its scan options are restored before returning it to the pool.
+     *
+     * @template TReturn
+     *
+     * @param callable(): TReturn $callback
+     * @return TReturn
+     */
+    public function withoutScanPrefix(callable $callback): mixed
+    {
+        if (($this->connection->getOption(Redis::OPT_SCAN) & Redis::SCAN_PREFIX) === 0) {
+            return $callback();
+        }
+
+        $this->connection->setOption(Redis::OPT_SCAN, Redis::SCAN_NOPREFIX);
+
+        try {
+            return $callback();
+        } finally {
+            // OPT_SCAN setters toggle individual flags; passing the saved bitmask can disable prefixing.
+            $this->connection->setOption(Redis::OPT_SCAN, Redis::SCAN_PREFIX);
+        }
+    }
+
+    /**
      * Execute the given callback without serialization or compression.
      *
      * Temporarily disables phpredis serialization and compression on the raw
@@ -1799,7 +1826,7 @@ abstract class RedisConnection extends BaseConnection implements NonCopyableCont
      * Safely scan the Redis keyspace for keys matching a pattern.
      *
      * This method handles the phpredis OPT_PREFIX complexity correctly:
-     * - Automatically prepends OPT_PREFIX to the scan pattern
+     * - Applies OPT_PREFIX to the scan pattern exactly once, respecting SCAN_PREFIX
      * - Strips OPT_PREFIX from returned keys so they work with other commands
      *
      * The connection must be held with transform disabled so SCAN retains its

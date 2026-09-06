@@ -105,16 +105,12 @@ final class SafeScan
     {
         $prefixLen = strlen($this->optPrefix);
 
-        // Apply OPT_PREFIX exactly once, whether phpredis adds it or not.
+        // Patterns are logical keys, even when they start with OPT_PREFIX.
+        // Prepend the connection prefix only when phpredis will not add it.
         $scanPattern = $pattern;
-        if ($prefixLen > 0) {
-            if (str_starts_with($scanPattern, $this->optPrefix)) {
-                $scanPattern = substr($scanPattern, $prefixLen);
-            }
-
-            if (($this->connection->getOption(Redis::OPT_SCAN) & Redis::SCAN_PREFIX) === 0) {
-                $scanPattern = $this->optPrefix . $scanPattern;
-            }
+        if ($prefixLen > 0
+            && ($this->connection->getOption(Redis::OPT_SCAN) & Redis::SCAN_PREFIX) === 0) {
+            $scanPattern = $this->optPrefix . $pattern;
         }
 
         // Route to cluster or standard implementation

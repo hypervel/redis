@@ -95,8 +95,8 @@ final class SafeScan
     /**
      * Execute the scan operation.
      *
-     * @param string $pattern The pattern to match (e.g., "cache:users:*").
-     *                        Should NOT include OPT_PREFIX - it will be added automatically.
+     * @param string $pattern The logical key pattern (e.g., "cache:users:*"). OPT_PREFIX is added automatically;
+     *                        the pattern is preserved even when it starts with the same bytes as OPT_PREFIX.
      * @param int $count The COUNT hint for SCAN (not a limit, just a hint to Redis)
      * @return Generator<string> yields keys with OPT_PREFIX stripped, safe for use with
      *                           other phpredis commands that auto-add the prefix
